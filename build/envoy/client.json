@@ -1,64 +1,81 @@
 {
-  "listeners": [
-    {
-      "address": "tcp://127.0.0.1:9001",
-      "filters": [
-        {
-          "name": "http_connection_manager",
-          "config": {
-            "codec_type": "auto",
-            "add_user_agent": true,
-            "idle_timeout_s": 840,
-            "access_log": [
-              {
-                "path": "/var/log/envoy/egress_http.log"
-              }
-            ],
-            "stat_prefix": "service_helloworld_egress",
-            "use_remote_address": true,
-            "route_config": {
-              "virtual_hosts": [
-                {
-                  "name": "service_helloworld",
-                  "domains": ["*"],
-                  "routes": [
-                    {
-                      "prefix": "/",
-                      "cluster": "service_helloworld"
-                    }
-                  ]
-                }
-              ]
-            },
+
+  "node": {
+    "id": "client-envoy"
+  },
+
+  "admin": {
+    "access_log_path": "/var/log/envoy/admin_access.log",
+    "address": {
+      "socket_address": {
+        "address": "0.0.0.0",
+        "port_value": "9901"
+      }
+    }
+  },
+
+  "static_resources": {
+
+    "listeners": [
+      {
+        "name": "service-outbound-listener",
+        "address": {
+          "socket_address": {
+            "address": "127.0.0.1",
+            "port_value": "9001",
+          }
+        },
+        "filter_chains": [
+          {
             "filters": [
               {
-                "name": "router",
-                "config": {}
+                "name": "envoy.http_connection_manager",
+                "config": {
+                  "codec_type": "auto",
+                  "stat_prefix": "service_helloworld_egress",
+                  "add_user_agent": true,
+                  "idle_timeout": "840s",
+                  "use_remote_address": true,
+                  "route_config": {
+                    "name": "client-route-config",
+                    "virtual_hosts": [
+                      {
+                        "name": "client-virtual-hosts",
+                        "domains": ["*"],
+                        "routes": [
+                          {
+                            "match": {"prefix": "/"},
+                            "route": {"cluster": "helloworld_service"}
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "http_filters": [{ "name": "envoy.router" }]
+                }
               }
             ]
           }
-        }
-      ]
-    }
-  ],
-  "admin": {
-    "access_log_path": "/var/log/envoy/admin_access.log",
-    "address": "tcp://0.0.0.0:9901"
-  },
-  "cluster_manager": {
+        ]
+      }
+    ],
+
     "clusters": [
       {
-        "name": "service_helloworld",
+        "name": "helloworld_service",
         "type": "strict_dns",
-        "lb_type": "round_robin",
-        "connect_timeout_ms": 250,
-        "features": "http2",
+        "connect_timeout": "0.25s",
+        "http2_protocol_options": {},
         "hosts": [
           {
-            "url": "tcp://service:9211"
+            "socket_address": {
+              "address":"service",
+              "port_value": "9211"
+            }
           }
         ]
       }
     ]
+
   }
 }
