@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+
+    service:
+        container_name: envoy_service
+        build:
+            context: ./build
+            dockerfile: Dockerfile-service
+        expose:
+            - "8082"
+
+    client:
+        container_name: envoy_client
+        build:
+            context: ./build
+            dockerfile: Dockerfile-client
+        expose:
+            - "8081"
+        ports:
+            - 8081:8081

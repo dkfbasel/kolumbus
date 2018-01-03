@@ -1,0 +1,64 @@
+{
+  "listeners": [
+    {
+      "address": "tcp://127.0.0.1:9001",
+      "filters": [
+        {
+          "name": "http_connection_manager",
+          "config": {
+            "codec_type": "auto",
+            "add_user_agent": true,
+            "idle_timeout_s": 840,
+            "access_log": [
+              {
+                "path": "/var/log/envoy/egress_http.log"
+              }
+            ],
+            "stat_prefix": "service_helloworld_egress",
+            "use_remote_address": true,
+            "route_config": {
+              "virtual_hosts": [
+                {
+                  "name": "service_helloworld",
+                  "domains": ["*"],
+                  "routes": [
+                    {
+                      "prefix": "/",
+                      "cluster": "service_helloworld"
+                    }
+                  ]
+                }
+              ]
+            },
+            "filters": [
+              {
+                "name": "router",
+                "config": {}
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "admin": {
+    "access_log_path": "/var/log/envoy/admin_access.log",
+    "address": "tcp://0.0.0.0:9901"
+  },
+  "cluster_manager": {
+    "clusters": [
+      {
+        "name": "service_helloworld",
+        "type": "strict_dns",
+        "lb_type": "round_robin",
+        "connect_timeout_ms": 250,
+        "features": "http2",
+        "hosts": [
+          {
+            "url": "tcp://service:9211"
+          }
+        ]
+      }
+    ]
+  }
+}
