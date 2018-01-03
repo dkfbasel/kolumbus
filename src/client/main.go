@@ -6,37 +6,27 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"path/filepath"
 	"strings"
 
 	helloworld "bitbucket.org/dkfbasel/envoy/src/proto"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 func main() {
 
 	var address string
 	var port int
-	var certificates string
 
 	flag.IntVar(&port, "port", 8081, "web hosting port")
 	flag.StringVar(&address, "grpc", "8082", "grpc service address")
-	flag.StringVar(&certificates, "certificates", "/app/certificates", "certificate directory")
 	flag.Parse()
 
 	if strings.Contains(address, ":") == false {
 		address = fmt.Sprintf("localhost:%s", address)
 	}
 
-	// load certificate file
-	creds, err := credentials.NewClientTLSFromFile(filepath.Join(certificates, "service.cert"), "")
-	if err != nil {
-		log.Fatalf("coud not load certificate files: %v\n", err)
-	}
-
 	// set up a connection to the grpc server
-	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(creds))
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v\n", err)
 	}
