@@ -7,15 +7,19 @@ services:
         build:
             context: ./build
             dockerfile: Dockerfile-service
+        volumes:
+            - ./build/envoy:/app/envoy
         expose:
-            - "8082"
+            - 8082
 
     client:
         container_name: envoy_client
         build:
             context: ./build
             dockerfile: Dockerfile-client
+        volumes:
+            - ./build/envoy:/app/envoy
         expose:
-            - "8081"
+            - 8081
         ports:
             - 8081:8081
