@@ -69,7 +69,7 @@
         "hosts": [
           {
             "socket_address": {
-              "address":"service",
+              "address":"helloworld_service",
               "port_value": "9211"
             }
           }
