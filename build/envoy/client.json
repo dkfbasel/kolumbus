@@ -1,7 +1,8 @@
 {
 
   "node": {
-    "id": "client-envoy"
+    "id": "client-envoy",
+    "cluster": "dkfbasel"
   },
 
   "admin": {
