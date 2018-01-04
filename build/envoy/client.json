@@ -37,20 +37,14 @@
                   "add_user_agent": true,
                   "idle_timeout": "840s",
                   "use_remote_address": true,
-                  "route_config": {
-                    "name": "client-route-config",
-                    "virtual_hosts": [
-                      {
-                        "name": "client-virtual-hosts",
-                        "domains": ["*"],
-                        "routes": [
-                          {
-                            "match": {"prefix": "/"},
-                            "route": {"cluster": "helloworld_service"}
-                          }
-                        ]
+                  "rds": {
+                    "route_config_name": "helloworld_service_routes",
+                    "config_source": {
+                      "api_config_source": {
+                        "api_type": "REST",
+                        "cluster_name": ["xds_cluster"]
                       }
-                    ]
+                    }
                   },
                   "http_filters": [{ "name": "envoy.router" }]
                 }
@@ -62,21 +56,30 @@
     ],
 
     "clusters": [
+
       {
-        "name": "helloworld_service",
+        "name": "xds_cluster",
         "type": "strict_dns",
         "connect_timeout": "0.25s",
-        "http2_protocol_options": {},
         "hosts": [
           {
             "socket_address": {
-              "address":"helloworld_service",
-              "port_value": "9211"
-            }
+              "address":"dns",
+              "port_value": "80"
+            },
           }
         ]
       }
-    ]
 
+    ]
+  },
+
+  "dynamic_resources": {
+    "cds_config": {
+      "api_config_source": {
+        "api_type": "REST",
+        "cluster_name": ["xds_cluster"]
+      }
+    }
   }
 }

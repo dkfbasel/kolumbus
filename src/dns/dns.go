@@ -48,7 +48,8 @@ func (dns *DNS) StartServer() error {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/dns", HandleServiceDiscovery(dns))
-	mux.HandleFunc("/v2/discovery:endpoints", HandleEnvoyRequest(dns))
+	mux.HandleFunc("/v2/discovery:clusters", HandleEnvoyClusterRequest(dns))
+	mux.HandleFunc("/v2/discovery:routes", HandleEnvoyRouteRequest(dns))
 
 	// start server and wait for completion
 	return http.ListenAndServe(":80", mux)
