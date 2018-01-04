@@ -2,7 +2,7 @@ version: '3'
 
 services:
 
-    service:
+    helloworld_service:
         container_name: envoy_service
         build:
             context: ./build
@@ -11,6 +11,9 @@ services:
             - ./build/envoy:/app/envoy
         expose:
             - 8082
+        labels:
+            - envoyproxy.service=helloworld_service
+            - envoyproxy.port=9211
 
     client:
         container_name: envoy_client
@@ -23,3 +26,17 @@ services:
             - 8081
         ports:
             - 8081:8081
+
+    dns:
+        container_name: envoy_dns
+        # build:
+        #     context: ./build
+        #     dockerfile: Dockerfile-dns
+        image: dkfbasel/hot-reload-go:1.9.2
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - ./src/dns/:/app
+        environment:
+            - PROJECT=bitbucket.org/dkfbasel/envoy/src/dns
+        ports:
+            - 8083:80
