@@ -37,16 +37,13 @@
                   "http_filters": [{
                     "name": "envoy.router"
                   }],
-                  "http2_protocol_options": {},
-                  "add_user_agent": true,
-                  "use_remote_address": true,
                   "rds": {
                     "route_config_name": "helloworld_service_routes",
                     "config_source": {
                       "api_config_source": {
-                        "api_type": "REST",
+                        "api_type": "rest",
                         "cluster_name": ["xds_cluster"],
-                        "refresh_delay": "2s"
+                        "refresh_delay": "5s"
                       }
                     }
                   },
@@ -91,6 +88,16 @@
       }
 
     ]
-  }
+  },
+
+  "dynamic_resources": {
+    "cds_config": {
+      "api_config_source": {
+        "api_type": "rest",
+        "cluster_name": ["xds_cluster"],
+        "refresh_delay": "5s"
+      }
+    }
+  },
 
 }
