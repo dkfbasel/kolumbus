@@ -30,13 +30,13 @@ func HandleEnvoyClusterRequest(dns *DNS) http.HandlerFunc {
 		endpoint := ClusterResource{}
 
 		endpoint.ResourceType = "type.googleapis.com/envoy.api.v2.Cluster"
-		endpoint.Type = "static"
+		endpoint.Type = "strict_dns"
 		endpoint.Name = "helloworld_service_cluster"
 		endpoint.ConnectTimeout = "0.25s"
 
 		endpoint.Hosts = []Host{Host{
 			SocketAddress: SocketAddress{
-				Address: "127.20.0.3",
+				Address: "helloworld_service",
 				Port:    "9211",
 			},
 		}}
