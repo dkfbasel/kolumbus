@@ -11,6 +11,7 @@ services:
             - ./build/envoy:/app/envoy
         expose:
             - 8082
+            - 9211
         labels:
             - envoyproxy.service=helloworld_service
             - envoyproxy.port=9211
@@ -22,6 +23,7 @@ services:
             dockerfile: Dockerfile-client
         volumes:
             - ./build/envoy:/app/envoy
+            - ./build/scripts:/app/scripts
         expose:
             - 8081
         ports:

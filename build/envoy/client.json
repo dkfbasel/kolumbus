@@ -19,7 +19,7 @@
 
     "listeners": [
       {
-        "name": "service-outbound-listener",
+        "name": "client-outbound-listener",
         "address": {
           "socket_address": {
             "address": "127.0.0.1",
@@ -32,21 +32,25 @@
               {
                 "name": "envoy.http_connection_manager",
                 "config": {
-                  "codec_type": "auto",
+                  "codec_type": "http2",
                   "stat_prefix": "service_helloworld_egress",
+                  "http_filters": [{
+                    "name": "envoy.router"
+                  }],
+                  "http2_protocol_options": {},
                   "add_user_agent": true,
-                  "idle_timeout": "840s",
                   "use_remote_address": true,
                   "rds": {
                     "route_config_name": "helloworld_service_routes",
                     "config_source": {
                       "api_config_source": {
                         "api_type": "REST",
-                        "cluster_name": ["xds_cluster"]
+                        "cluster_name": ["xds_cluster"],
+                        "refresh_delay": "2s"
                       }
                     }
                   },
-                  "http_filters": [{ "name": "envoy.router" }]
+
                 }
               }
             ]
@@ -64,22 +68,29 @@
         "hosts": [
           {
             "socket_address": {
-              "address":"dns",
+              "address": "dns",
               "port_value": "80"
             },
+          }
+        ]
+      },
+
+      {
+        "name": "helloworld_service_cluster",
+        "type": "strict_dns",
+        "connect_timeout": "0.25s",
+        "http2_protocol_options": {},
+        "hosts": [
+          {
+            "socket_address": {
+              "address": "helloworld_service",
+              "port_value": "9211"
+            }
           }
         ]
       }
 
     ]
-  },
-
-  "dynamic_resources": {
-    "cds_config": {
-      "api_config_source": {
-        "api_type": "REST",
-        "cluster_name": ["xds_cluster"]
-      }
-    }
   }
+
 }

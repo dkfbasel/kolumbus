@@ -28,20 +28,24 @@ func HandleEnvoyRouteRequest(dns *DNS) http.HandlerFunc {
 		endpoint.Name = "helloworld_service_routes"
 
 		endpoint.VirtualHosts = []VirtualHost{VirtualHost{
-			Name:    "virtual-helloworld_service",
+			Name:    "client-virtual-hosts",
 			Domains: []string{"*"},
 			Routes: []Route{Route{
 				Match: RouteMatch{
 					Prefix: "/",
 				},
 				Route: RouteRouting{
-					Cluster: "helloworld_service",
+					Cluster: "helloworld_service_cluster",
 				},
 			},
 			},
 		}}
 
-		response := EnvoyRouteResponse{VersionInfo: "0"}
+		response := EnvoyRouteResponse{
+			VersionInfo: "1",
+			TypeURL:     "type.googleapis.com/envoy.api.v2.RouteConfiguration",
+		}
+
 		response.Resources = []RouteResource{endpoint}
 
 		content, err := json.Marshal(response)
@@ -61,6 +65,7 @@ func HandleEnvoyRouteRequest(dns *DNS) http.HandlerFunc {
 // EnvoyRouteResponse is used to return information to envoy
 type EnvoyRouteResponse struct {
 	VersionInfo string          `json:"version_info"`
+	TypeURL     string          `json:"type_url"`
 	Resources   []RouteResource `json:"resources"`
 }
 
