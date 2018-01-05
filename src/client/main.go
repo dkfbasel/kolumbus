@@ -52,7 +52,8 @@ func main() {
 		})
 
 		if err2 != nil {
-			log.Fatalf("could not echo: %v\n", err)
+			log.Printf("could not call service: %v\n", err2)
+			fmt.Fprintln(w, "could not call service")
 			return
 		}
 
