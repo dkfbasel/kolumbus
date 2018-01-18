@@ -147,10 +147,10 @@
 			"revisionTime": "2018-01-02T15:04:22Z"
 		},
 		{
-			"checksumSHA1": "USrPIXfba7TIyuZNv6gAQi8+Siw=",
+			"checksumSHA1": "ngMe116x9O0FSbO2hF/v5vzbdww=",
 			"path": "github.com/moby/moby/client",
-			"revision": "99c22b0034605d283d9ddcfc72b1f450d130c976",
-			"revisionTime": "2018-01-03T14:21:00Z"
+			"revision": "ef3988a81f5dca972b129df527f3e4f8bba200b8",
+			"revisionTime": "2018-01-17T20:03:11Z"
 		},
 		{
 			"checksumSHA1": "OFNit1Qx2DdWhotfREKodDNUwCM=",
@@ -201,5 +201,5 @@
 			"revisionTime": "2017-12-22T10:59:23Z"
 		}
 	],
-	"rootPath": "bitbucket.org/dkfbasel/envoy/src/dns"
+	"rootPath": "bitbucket.org/dkfbasel/envoy/src/kolumbus"
 }

@@ -5,15 +5,11 @@ import (
 	"log"
 	"net/http"
 	"sync"
-
-	docker "github.com/moby/moby/client"
-	"github.com/pkg/errors"
 )
 
-// DNS provides the methods
-type DNS struct {
-	DockerCli *docker.Client
-	Services  map[string][]Endpoint
+// Kolumbus provides the methods
+type Kolumbus struct {
+	Services map[string][]Endpoint
 	sync.RWMutex
 }
 
@@ -23,33 +19,20 @@ type Endpoint struct {
 	Port string // port of the service
 }
 
-// NewDNS will initialize a new dns server
-func NewDNS() *DNS {
+// NewKolumbus will initialize a new dns server
+func NewKolumbus() *Kolumbus {
 
-	dns := DNS{}
+	dns := Kolumbus{}
 	dns.Services = make(map[string][]Endpoint)
 
 	return &dns
 }
 
-// InitDocker will initialize a new docker command line interface
-func (dns *DNS) InitDocker() error {
-
-	cli, err := docker.NewEnvClient()
-	if err != nil {
-		return errors.Wrap(err, "could not initialize docker cli")
-	}
-
-	dns.DockerCli = cli
-
-	return nil
-}
-
-// StartServer will start a http server
-func (dns *DNS) StartServer() error {
+// StartServer will start a http server to provide service information for envoy
+// proxies
+func (dns *Kolumbus) StartServer() error {
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/dns", HandleServiceDiscovery(dns))
 	mux.HandleFunc("/v2/discovery:clusters", HandleEnvoyClusterRequest(dns))
 	mux.HandleFunc("/v2/discovery:routes", HandleEnvoyRouteRequest(dns))
 	mux.HandleFunc("/", HandleAnyRequest(dns))
@@ -59,7 +42,7 @@ func (dns *DNS) StartServer() error {
 }
 
 // HandleAnyRequest will handle all request to paths that were not specified before
-func HandleAnyRequest(dns *DNS) http.HandlerFunc {
+func HandleAnyRequest(dns *Kolumbus) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		log.Printf("got other request: %s\n", r.URL.String())

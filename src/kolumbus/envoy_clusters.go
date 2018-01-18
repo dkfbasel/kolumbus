@@ -2,46 +2,66 @@ package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"fmt"
 	"log"
 	"net/http"
 )
 
 // HandleEnvoyClusterRequest will handle envoy discovery requests for clusters
-func HandleEnvoyClusterRequest(dns *DNS) http.HandlerFunc {
+func HandleEnvoyClusterRequest(dns *Kolumbus) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		log.Println("got cluster request")
+		// log.Println("got cluster request")
 
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			log.Printf("could not read body: %+v\n", err)
-		}
-		_ = r.Body.Close()
+		// body, err := ioutil.ReadAll(r.Body)
+		// if err != nil {
+		// 	log.Printf("could not read body: %+v\n", err)
+		// }
+		// _ = r.Body.Close()
 
-		log.Printf("body: %s\n", body)
+		// log.Printf("body: %s\n", body)
 
 		response := EnvoyClusterResponse{
 			VersionInfo: "1",
 			TypeURL:     "type.googleapis.com/envoy.api.v2.Cluster",
 		}
 
-		endpoint := ClusterResource{}
+		response.Resources = []ClusterResource{}
 
-		endpoint.ResourceType = "type.googleapis.com/envoy.api.v2.Cluster"
-		endpoint.Type = "strict_dns"
-		endpoint.Name = "helloworld_service_cluster"
-		endpoint.ConnectTimeout = "0.25s"
+		// lock write access to the dns struct
+		dns.RLock()
 
-		endpoint.Hosts = []Host{Host{
-			SocketAddress: SocketAddress{
-				Address: "helloworld_service",
-				Port:    "9211",
-			},
-		}}
+		// iterate through all services
+		for serviceName, hosts := range dns.Services {
 
-		response.Resources = []ClusterResource{endpoint}
+			// initialize a new service cluster
+			endpoint := ClusterResource{}
+
+			endpoint.ResourceType = "type.googleapis.com/envoy.api.v2.Cluster"
+			endpoint.Type = "strict_dns"
+
+			// set the name of the service cluster
+			endpoint.Name = fmt.Sprintf("%s_service_cluster", serviceName)
+			endpoint.ConnectTimeout = "0.25s"
+
+			// add all available hosts to the service cluster
+			endpoint.Hosts = make([]Host, len(hosts))
+
+			for index, item := range hosts {
+				host := Host{
+					SocketAddress: SocketAddress{
+						Address: item.Host,
+						Port:    item.Port,
+					},
+				}
+				endpoint.Hosts[index] = host
+			}
+
+			response.Resources = append(response.Resources, endpoint)
+		}
+
+		dns.RUnlock()
 
 		content, err := json.Marshal(response)
 		if err != nil {

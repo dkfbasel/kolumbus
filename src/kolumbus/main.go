@@ -1,4 +1,4 @@
-// dockerdns will watch docker for specific labels and create a dns server that
+// kolumbus will watch docker for specific labels and create a dns server that
 // enables envoyproxy to create a dynamic microservice mesh
 package main
 
@@ -6,14 +6,14 @@ import "log"
 
 func main() {
 
-	dns := NewDNS()
+	kolumbus := NewKolumbus()
 
-	err := dns.InitDocker()
+	err := kolumbus.StartDockerWatch()
 	if err != nil {
 		log.Fatalf("could not init docker: %+v\n", err)
 	}
 
-	err = dns.StartServer()
+	err = kolumbus.StartServer()
 	if err != nil {
 		log.Fatalf("could not start server: %+v\n", err)
 	}
