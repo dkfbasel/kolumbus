@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+
+    kolumbus:
+        build:
+            context: ./build
+            dockerfile: Dockerfile-kolumbus
+        volumes:
+            # docker socket is required to query docker status from the container
+            - /var/run/docker.sock:/var/run/docker.sock
+        ports:
+            # open external port to peak into dns status
+            - 8084:80
+
+    client:
+        build:
+            context: ./build
+            dockerfile: Dockerfile-client
+        volumes:
+            - ./build/envoy:/app/envoy
+            - ./build/scripts:/app/scripts
+        ports:
+            # start test via http request to the client
+            - 7071:80
+            # connection to envoyproxy admin interface
+            - 8082:9901
+
+    echo:
+        build:
+            context: ./build
+            dockerfile: Dockerfile-service
+        volumes:
+            - ./build/envoy:/app/envoy
+            - ./build/scripts:/app/scripts
+        ports:
+            # connection to envoyproxy admin interface
+            - 8083:9901
+        labels:
+            # service name must match the name of the grpc package as the grpc
+            # connection is made to address/packagename.servicename/methodname
+            # route matching is done via prefix
+            # i.e. helloworld or helloworld.Helloworld would work here
+            - envoyproxy.service=helloworld
+            - envoyproxy.port=80
+
+    echo2:
+        build:
+            context: ./build
+            dockerfile: Dockerfile-service
+        volumes:
+            - ./build/envoy:/app/envoy
+            - ./build/scripts:/app/scripts
+        labels:
+            - envoyproxy.service=helloworld
+            - envoyproxy.port=80
