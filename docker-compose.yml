@@ -2,19 +2,17 @@ version: '3'
 
 services:
 
-    helloworld_service:
-        container_name: envoy_service
-        build:
-            context: ./build
-            dockerfile: Dockerfile-service
+    kolumbus:
+        container_name: envoy_kolumbus
+        image: dkfbasel/hot-reload-go:1.9.2
         volumes:
-            - ./build/envoy:/app/envoy
-        expose:
-            - 8082
-            - 9211
-        labels:
-            - envoyproxy.service=helloworld_service
-            - envoyproxy.port=9211
+            # docker socket is required to query docker status
+            - /var/run/docker.sock:/var/run/docker.sock
+            - ./src/kolumbus/:/app
+        environment:
+            - PROJECT=bitbucket.org/dkfbasel/envoy/src/kolumbus
+        ports:
+            - 8084:80
 
     client:
         container_name: envoy_client
@@ -27,18 +25,27 @@ services:
         expose:
             - 8081
         ports:
+            # direct connection to client
             - 8081:8081
+            # connection to envoyproxy admin interface
+            - 8082:9901
 
-    dns:
-        container_name: envoy_dns
-        # build:
-        #     context: ./build
-        #     dockerfile: Dockerfile-dns
-        image: dkfbasel/hot-reload-go:1.9.2
+    helloworld_service:
+        container_name: envoy_service
+        build:
+            context: ./build
+            dockerfile: Dockerfile-service
         volumes:
-            - /var/run/docker.sock:/var/run/docker.sock
-            - ./src/dns/:/app
-        environment:
-            - PROJECT=bitbucket.org/dkfbasel/envoy/src/dns
+            - ./build/envoy:/app/envoy
+            - ./build/scripts:/app/scripts
+        expose:
+            # direct connection to service
+            - 8082
+            # connection via envoyproxy
+            - 9211
         ports:
-            - 8083:80
+            # connection to envoyproxy admin interface
+            - 8083:9901
+        labels:
+            - envoyproxy.service=helloworld
+            - envoyproxy.port=9211
