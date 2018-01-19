@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 
-	helloworld "bitbucket.org/dkfbasel/kolumbus/examples/grpc/src/proto"
+	helloworld "github.com/dkfbasel/kolumbus/examples/grpc/src/proto"
 	"google.golang.org/grpc"
 )
 
