@@ -29,3 +29,5 @@ Please note that `Kolumbus` is currently pretty new and we are working on
 several aspects to improve the devops experience.
 
 An example on how it can be used is in the examples/grpc directory.
+
+Kolumbus is provided as docker container from dkfbasel/kolumbus
