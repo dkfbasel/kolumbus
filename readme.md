@@ -1,4 +1,7 @@
 # Kolumbus: Creating a service mesh with docker and envoyproxy
+
+![Overview](kolumbus.png)
+
 Docker makes it easy to package your applications and run it reliably in
 different environments.
 
