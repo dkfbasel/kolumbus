@@ -9,7 +9,7 @@ RUN mkdir /app
 ADD bin/service /app/bin/service
 
 # ADD STARTUP SCRIPTS
-ADD scripts/service.sh /app/scripts/service.ch
+ADD scripts/service.sh /app/scripts/service.sh
 
 # ADD ENVOY CONFIGURATION
 ADD envoy/service.json /app/envoy/service.json
