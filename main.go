@@ -21,4 +21,12 @@ func main() {
 		log.Fatalf("could not start server: %+v\n", err)
 	}
 
+	// start envoy and optionally open a port for external communication
+
+	// proxy on server:
+	// host and port to start the server on
+
+	// proxy on remote machine:
+	// host and port of remote address
+
 }
