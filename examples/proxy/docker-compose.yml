@@ -1,0 +1,20 @@
+version: '2'
+
+services:
+
+  client:
+    container_name: envoyproxy.client
+    build:
+      context: ../grpc/build
+      dockerfile: Dockerfile-client
+    command: /app/scripts/local.sh
+    volumes:
+      - ./logs:/var/log/envoy
+      - ./local.sh:/app/scripts/local.sh
+      - ./local-config.json:/app/envoy/config.json
+
+    ports:
+      # start test via http request to the client
+      - 7071:80
+      # connection to envoyproxy admin interface
+      - 8082:9901
