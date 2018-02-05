@@ -42,7 +42,7 @@
                     "config_source": {
                       "api_config_source": {
                         "api_type": "rest",
-                        "cluster_name": ["xds_cluster"],
+                        "cluster_names": ["xds_cluster"],
                         "refresh_delay": "5s"
                       }
                     }
@@ -79,7 +79,7 @@
     "cds_config": {
       "api_config_source": {
         "api_type": "rest",
-        "cluster_name": ["xds_cluster"],
+        "cluster_names": ["xds_cluster"],
         "refresh_delay": "5s"
       }
     }
