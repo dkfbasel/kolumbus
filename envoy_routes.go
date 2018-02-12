@@ -64,6 +64,22 @@ func HandleEnvoyRouteRequest(dns *Kolumbus) http.HandlerFunc {
 
 		}
 
+		// TODO: only add remote services if any are specified
+
+		// add remote connections as last option (matching or routes is done
+		// in order of definition)
+		remoteServices := Route{
+			Match: RouteMatch{
+				Prefix: "*",
+			},
+			Route: RouteRouting{
+				Cluster: "remote_cluster",
+			},
+		}
+
+		// append a routes for remote services to the list
+		virtualHost.Routes = append(virtualHost.Routes, remoteServices)
+
 		// only one virtual host is used
 		endpoint.VirtualHosts = []VirtualHost{virtualHost}
 
