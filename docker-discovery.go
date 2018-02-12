@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -12,11 +11,12 @@ import (
 
 // StartDockerWatch will initialize a new docker command line interface and
 // start watching for container changes in docker
-func (dns *Kolumbus) StartDockerWatch() error {
+func (dns *Kolumbus) StartDockerWatch(errs chan error) {
 
 	cli, err := docker.NewEnvClient()
 	if err != nil {
-		return errors.Wrap(err, "could not initialize docker cli")
+		errs <- errors.Wrap(err, "could not initialize docker cli")
+		return
 	}
 
 	// initialize periodic watcher for clients
@@ -26,7 +26,7 @@ func (dns *Kolumbus) StartDockerWatch() error {
 			services, err := findServices(cli)
 
 			if err != nil {
-				log.Printf("could not find docker services: %s", err)
+				errs <- errors.Wrap(err, "could not find docker services")
 			}
 
 			if err == nil {
@@ -40,8 +40,6 @@ func (dns *Kolumbus) StartDockerWatch() error {
 			<-time.After(time.Second * 5)
 		}
 	}()
-
-	return nil
 }
 
 // findServices will handle the recovery of services via docker labels
