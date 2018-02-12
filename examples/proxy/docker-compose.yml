@@ -2,19 +2,40 @@ version: '2'
 
 services:
 
-  client:
-    container_name: envoyproxy.client
+  kolumbus:
+    container_name: kolumbus.proxy.kolumbus
     build:
-      context: ../grpc/build
-      dockerfile: Dockerfile-client
-    command: /app/scripts/local.sh
+      context: ../../build
     volumes:
-      - ./logs:/var/log/envoy
-      - ./local.sh:/app/scripts/local.sh
-      - ./local-config.json:/app/envoy/config.json
-
+      # docker socket is required to query docker status from the container
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
-      # start test via http request to the client
+      - 8084:80
+      - 8086:9901
+
+  client:
+    container_name: kolumbus.proxy.client
+    image: dkfbasel/hot-reload-go:1.9.2
+    volumes:
+      - ./src/client:/go/src/github.com/dkfbasel/kolumbus/examples/proxy/src/client
+      - ./src/proto:/go/src/github.com/dkfbasel/kolumbus/examples/proxy/src/proto
+    environment:
+      - PROJECT=github.com/dkfbasel/kolumbus/examples/proxy/src/client
+    ports:
       - 7071:80
-      # connection to envoyproxy admin interface
-      - 8082:9901
+
+  echo:
+    container_name: kolumbus.proxy.helloworld
+    image: dkfbasel/hot-reload-go:1.9.2
+    volumes:
+      - ./src/service:/go/src/github.com/dkfbasel/kolumbus/examples/proxy/src/service
+      - ./src/proto/helloworld:/go/src/github.com/dkfbasel/kolumbus/examples/proxy/src/proto/helloworld
+    environment:
+      - PROJECT=github.com/dkfbasel/kolumbus/examples/proxy/src/service
+    labels:
+      # service name must match the name of the grpc package as the grpc
+      # connection is made to address/packagename.servicename/methodname
+      # route matching is done via prefix
+      # i.e. helloworld or helloworld.Helloworld would work here
+      - envoyproxy.service=helloworld
+      - envoyproxy.port=80
