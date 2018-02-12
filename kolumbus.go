@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"sync"
+
+	"github.com/pkg/errors"
 )
 
 // Kolumbus provides the methods
@@ -30,15 +32,19 @@ func FindABraveNewWorld() *Kolumbus {
 
 // StartDNSServer will start a http server to provide service information for envoy
 // proxies
-func (dns *Kolumbus) StartDNSServer() error {
+func (dns *Kolumbus) StartDNSServer(errs chan error) {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/v2/discovery:clusters", HandleEnvoyClusterRequest(dns))
 	mux.HandleFunc("/v2/discovery:routes", HandleEnvoyRouteRequest(dns))
 	mux.HandleFunc("/", HandleAnyRequest(dns))
 
-	// start server and wait for completion
-	return http.ListenAndServe(":80", mux)
+	go func() {
+		err := http.ListenAndServe(":80", mux)
+		if err != nil {
+			errs <- errors.Wrap(err, "could not start discovery service")
+		}
+	}()
 }
 
 // HandleAnyRequest will handle all request to paths that were not specified before

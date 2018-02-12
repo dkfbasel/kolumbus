@@ -8,20 +8,27 @@ func main() {
 
 	kolumbus := FindABraveNewWorld()
 
+	// initialize a channel of errors
+	errorChan := make(chan error)
+
 	// start watching docker containers for services
-	err := kolumbus.StartDockerWatch()
-	if err != nil {
-		log.Fatalf("could not init docker: %+v\n", err)
-	}
+	kolumbus.StartDockerWatch(errorChan)
+	log.Println("- docker container watch started")
 
-	// start a dns service for envoyproxies to automatically
+	// start an envoyproxy and optionally open a port for
+	// external communication
+	kolumbus.StartEnvoyproxy(errorChan)
+	log.Println("- envoy proxy started")
+
+	// start a discovery service for envoyproxies to automatically
 	// create a service mesh
-	err = kolumbus.StartDNSServer()
-	if err != nil {
-		log.Fatalf("could not start server: %+v\n", err)
-	}
+	kolumbus.StartDNSServer(errorChan)
+	log.Println("- envoy discovery server started")
 
-	// start envoy and optionally open a port for external communication
+	// log any errors
+	for err := range errorChan {
+		log.Printf("%+v\n", err)
+	}
 
 	// proxy on server:
 	// host and port to start the server on
