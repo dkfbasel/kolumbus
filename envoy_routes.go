@@ -28,46 +28,47 @@ func HandleEnvoyRouteRequest(dns *Kolumbus) http.HandlerFunc {
 			TypeURL:     "type.googleapis.com/envoy.api.v2.RouteConfiguration",
 		}
 
-		// initialize all resources
-		response.Resources = []RouteResource{}
-
 		// lock access to dns records
 		dns.RLock()
+
+		// initalize a new endpoint
+		endpoint := RouteResource{}
+
+		endpoint.ResourceType = "type.googleapis.com/envoy.api.v2.RouteConfiguration"
+		endpoint.Name = "kolumbus_routes"
+
+		// define a new virtual host
+		virtualHost := VirtualHost{
+			Name:    "kolumbus-virtual-hosts",
+			Domains: []string{"*"},
+			Routes:  []Route{},
+		}
 
 		// iterate through all services
 		for serviceName := range dns.Services {
 
-			// initalize a new endpoint
-			endpoint := RouteResource{}
-
-			endpoint.ResourceType = "type.googleapis.com/envoy.api.v2.RouteConfiguration"
-			endpoint.Name = "kolumbus_routes"
-
-			// define the route that will be matched for the service
-			routeMatch := fmt.Sprintf("/%s", serviceName)
-
-			// define the name of the cluster for the service
-			clusterName := fmt.Sprintf("%s_service_cluster", serviceName)
-
-			// generate the virtual hosts configuration for the service
-			endpoint.VirtualHosts = []VirtualHost{VirtualHost{
-				Name:    fmt.Sprintf("%s-virtual-hosts", serviceName),
-				Domains: []string{"*"},
-				Routes: []Route{Route{
-					Match: RouteMatch{
-						Prefix: routeMatch,
-					},
-					Route: RouteRouting{
-						Cluster: clusterName,
-					},
+			// define a new route to match (one for each service cluster)
+			route := Route{
+				Match: RouteMatch{
+					// prefix must match the name of the grpc service
+					Prefix: fmt.Sprintf("/%s", serviceName),
 				},
+				Route: RouteRouting{
+					// cluster to route to
+					Cluster: fmt.Sprintf("%s_service_cluster", serviceName),
 				},
-			}}
+			}
 
 			// append the service cluster to the routes list
-			response.Resources = append(response.Resources, endpoint)
+			virtualHost.Routes = append(virtualHost.Routes, route)
 
 		}
+
+		// only one virtual host is used
+		endpoint.VirtualHosts = []VirtualHost{virtualHost}
+
+		// only one endpoint resources is provided (all through kolumbus)
+		response.Resources = []RouteResource{endpoint}
 
 		// unlock access
 		dns.RUnlock()
