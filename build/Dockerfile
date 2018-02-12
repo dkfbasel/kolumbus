@@ -1,12 +1,21 @@
 # USE ALPINE LINUX AS BASE IMAGE (TO ALLOW BASH NAVIGATION)
-FROM alpine:3.7
+FROM envoyproxy/envoy-alpine:0f88bc5113d4cce320045c3cd11d626af69bd775
 
 MAINTAINER DKF-Basel <info@dkfbasel.ch>
 LABEL copyright="Departement Klinische Forschung, Basel, Switzerland. 2017"
 
-# COPY THE APPLICATIN FILES INTO THE CONTAINER
+# create an application volume
 RUN mkdir /app
+
+# create directories for envoy configuration and logs
+RUN mkdir -p /app/envoy/config
+RUN mkdir -p /app/envoy/log
+
+# add the kolumbus binary
 ADD kolumbus /app/bin/kolumbus
+
+# add an envoy-configuration to use envoy as proxy for all other containers
+ADD proxy/config.json /app/envoy/config/proxy.json
 
 # SET THE CURRENT WORKING DIRECTORY
 WORKDIR /app
