@@ -47,22 +47,6 @@
                     }
                   }
                 }
-              },
-
-              {
-                "name": "envoy.tcp_proxy",
-                "config": {
-                  "stat_prefix": "proxy-remote",
-                  "cluster": "remote_cluster",
-                  "idle_timeout": "5s",
-                  "max_connect_attempts": 5,
-                  "access_log": {
-                    "name": "envoy.file_access_log",
-                    "config": {
-                      "path": "/app/envoy/log/tcp_proxy.log"
-                    }
-                  }
-                }
               }
 
             ]
@@ -90,6 +74,7 @@
       {
         "name": "remote_cluster",
         "type": "strict_dns",
+        "http2_protocol_options": {},
         "connect_timeout": "0.25s",
         "hosts": [
           {
