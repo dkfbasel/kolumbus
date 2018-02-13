@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 
-	helloworld "github.com/dkfbasel/kolumbus/examples/grpc/src/proto"
+	helloworld "github.com/dkfbasel/kolumbus/examples/grpc-dev/src/proto/helloworld"
 	"google.golang.org/grpc"
 )
 
@@ -18,11 +18,11 @@ func main() {
 	var port int
 
 	flag.IntVar(&port, "port", 80, "web hosting port")
-	flag.StringVar(&address, "grpc", "8081", "grpc service address")
+	flag.StringVar(&address, "grpc", "kolumbus:8080", "kolumbus envoyproxy address")
 	flag.Parse()
 
 	if strings.Contains(address, ":") == false {
-		address = fmt.Sprintf("127.0.0.1:%s", address)
+		log.Fatalf("host for grpc connection must be specified")
 	}
 
 	// set up a connection to the grpc server

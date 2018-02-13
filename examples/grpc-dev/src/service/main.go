@@ -7,14 +7,14 @@ import (
 	"log"
 	"net"
 
-	helloworld "github.com/dkfbasel/kolumbus/examples/grpc/src/proto"
+	helloworld "github.com/dkfbasel/kolumbus/examples/grpc-dev/src/proto/helloworld"
 	"google.golang.org/grpc"
 )
 
 func main() {
 
 	var port int
-	flag.IntVar(&port, "port", 8080, "grpc port")
+	flag.IntVar(&port, "port", 80, "port to listen on for grpc requests")
 	flag.Parse()
 
 	// initialize a tcp listener

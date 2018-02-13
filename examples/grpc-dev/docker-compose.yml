@@ -17,10 +17,10 @@ services:
     container_name: kolumbus.proxy.client
     image: dkfbasel/hot-reload-go:1.9.2
     volumes:
-      - ./src/client:/go/src/github.com/dkfbasel/kolumbus/examples/proxy/src/client
-      - ./src/proto:/go/src/github.com/dkfbasel/kolumbus/examples/proxy/src/proto
+      - ./src/client:/go/src/github.com/dkfbasel/kolumbus/examples/grpc-dev/src/client
+      - ./src/proto:/go/src/github.com/dkfbasel/kolumbus/examples/grpc-dev/src/proto
     environment:
-      - PROJECT=github.com/dkfbasel/kolumbus/examples/proxy/src/client
+      - PROJECT=github.com/dkfbasel/kolumbus/examples/grpc-dev/src/client
     ports:
       - 7071:80
 
@@ -28,10 +28,10 @@ services:
     container_name: kolumbus.proxy.helloworld
     image: dkfbasel/hot-reload-go:1.9.2
     volumes:
-      - ./src/service:/go/src/github.com/dkfbasel/kolumbus/examples/proxy/src/service
-      - ./src/proto/helloworld:/go/src/github.com/dkfbasel/kolumbus/examples/proxy/src/proto/helloworld
+      - ./src/service:/go/src/github.com/dkfbasel/kolumbus/examples/grpc-dev/src/service
+      - ./src/proto/helloworld:/go/src/github.com/dkfbasel/kolumbus/examples/grpc-dev/src/proto/helloworld
     environment:
-      - PROJECT=github.com/dkfbasel/kolumbus/examples/proxy/src/service
+      - PROJECT=github.com/dkfbasel/kolumbus/examples/grpc-dev/src/service
     labels:
       # service name must match the name of the grpc package as the grpc
       # connection is made to address/packagename.servicename/methodname
