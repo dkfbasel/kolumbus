@@ -3,6 +3,7 @@ version: '3'
 services:
 
     kolumbus:
+        container_name: kolumbus.grpc.prod.kolumbus
         build:
             context: ./build
             dockerfile: Dockerfile-kolumbus
@@ -14,6 +15,7 @@ services:
             - 8084:80
 
     client:
+        container_name: kolumbus.grpc.prod.client
         build:
             context: ./build
             dockerfile: Dockerfile-client
@@ -27,6 +29,7 @@ services:
             - 8082:9901
 
     echo:
+        container_name: kolumbus.gprc.prod.echo1
         build:
             context: ./build
             dockerfile: Dockerfile-service
@@ -45,6 +48,7 @@ services:
             - envoyproxy.port=80
 
     echo2:
+        container_name: kolumbus.gprc.prod.echo2
         build:
             context: ./build
             dockerfile: Dockerfile-service
