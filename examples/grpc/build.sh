@@ -9,9 +9,3 @@ cd ../..
 cd ./src/client
 gox -osarch="linux/amd64" -output="../../build/bin/client"
 cd ../..
-
-# build the kolumbus binary
-cd ../..
-gox -osarch="linux/amd64" -output="examples/grpc/build/bin/kolumbus"
-
-cd ./examples/grpc
