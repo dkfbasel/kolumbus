@@ -1,5 +1,5 @@
 # USE ALPINE LINUX AS BASE IMAGE (TO ALLOW BASH NAVIGATION)
-FROM envoyproxy/envoy-alpine:0f88bc5113d4cce320045c3cd11d626af69bd775
+FROM envoyproxy/envoy-alpine:3016680a511cd08d60cbcb8b8338cebb76ca7dca
 
 MAINTAINER DKF-Basel <info@dkfbasel.ch>
 LABEL copyright="Departement Klinische Forschung, Basel, Switzerland. 2017"
