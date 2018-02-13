@@ -70,7 +70,7 @@ func HandleEnvoyRouteRequest(dns *Kolumbus) http.HandlerFunc {
 		// in order of definition)
 		remoteServices := Route{
 			Match: RouteMatch{
-				Prefix: "*",
+				Prefix: "/",
 			},
 			Route: RouteRouting{
 				Cluster: "remote_cluster",
