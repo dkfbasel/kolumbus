@@ -20,9 +20,9 @@ func main() {
 	kolumbus.StartEnvoyproxy(errorChan)
 	log.Println("- envoy proxy started")
 
-	// start a discovery service for envoyproxies to automatically
+	// start a data plane discovery service for envoyproxies to automatically
 	// create a service mesh
-	kolumbus.StartDNSServer(errorChan)
+	kolumbus.StartEnvoyDataPlaneServer(errorChan)
 	log.Println("- envoy discovery server started")
 
 	// log any errors

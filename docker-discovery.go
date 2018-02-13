@@ -11,7 +11,7 @@ import (
 
 // StartDockerWatch will initialize a new docker command line interface and
 // start watching for container changes in docker
-func (dns *Kolumbus) StartDockerWatch(errs chan error) {
+func (dns *Kolumbus) StartDockerWatch(errs chan<- error) {
 
 	cli, err := docker.NewEnvClient()
 	if err != nil {

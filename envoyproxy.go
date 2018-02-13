@@ -9,7 +9,7 @@ import (
 
 // StartEnvoyproxy will initialize an envoy proxy that can be used to connect
 // services locally or with a remote service (local services will be prioritized)
-func (dns *Kolumbus) StartEnvoyproxy(errs chan error) {
+func (dns *Kolumbus) StartEnvoyproxy(errs chan<- error) {
 
 	// command to start envoy
 	// /usr/local/bin/envoy -c /app/envoy/config.json --v2-config-only -l error

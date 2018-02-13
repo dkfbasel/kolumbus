@@ -3,12 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
+
+	"github.com/pkg/errors"
 )
 
 // HandleEnvoyClusterRequest will handle envoy discovery requests for clusters
-func HandleEnvoyClusterRequest(dns *Kolumbus) http.HandlerFunc {
+func HandleEnvoyClusterRequest(dns *Kolumbus, errs chan<- error) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -65,12 +66,13 @@ func HandleEnvoyClusterRequest(dns *Kolumbus) http.HandlerFunc {
 
 		content, err := json.Marshal(response)
 		if err != nil {
-			log.Printf("could not marshal response: %+v\n", err)
+			errs <- errors.Wrap(err, "could not marshal response")
+			return
 		}
 
 		_, err = w.Write(content)
 		if err != nil {
-			log.Printf("problem when writing: %+v\n", err)
+			errs <- errors.Wrap(err, "could not write response")
 		}
 
 	}

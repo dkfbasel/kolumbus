@@ -30,14 +30,15 @@ func FindABraveNewWorld() *Kolumbus {
 	return &dns
 }
 
-// StartDNSServer will start a http server to provide service information for envoy
-// proxies
-func (dns *Kolumbus) StartDNSServer(errs chan error) {
+// StartEnvoyDataPlaneServer will start a http server to provide service
+// information for envoy proxies
+func (dns *Kolumbus) StartEnvoyDataPlaneServer(errs chan<- error) {
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/v2/discovery:clusters", HandleEnvoyClusterRequest(dns))
-	mux.HandleFunc("/v2/discovery:routes", HandleEnvoyRouteRequest(dns))
-	mux.HandleFunc("/", HandleAnyRequest(dns))
+	mux.HandleFunc("/v2/discovery:clusters", HandleEnvoyClusterRequest(dns, errs))
+	mux.HandleFunc("/v2/discovery:routes", HandleEnvoyRouteRequest(dns, errs))
+	mux.HandleFunc("/v1/certs/list/approved", HandleEnvoyCertificateRequest(dns, errs))
+	mux.HandleFunc("/", HandleAnyRequest(dns, errs))
 
 	go func() {
 		err := http.ListenAndServe(":80", mux)
@@ -48,14 +49,14 @@ func (dns *Kolumbus) StartDNSServer(errs chan error) {
 }
 
 // HandleAnyRequest will handle all request to paths that were not specified before
-func HandleAnyRequest(dns *Kolumbus) http.HandlerFunc {
+func HandleAnyRequest(dns *Kolumbus, errs chan<- error) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		log.Printf("got other request: %s\n", r.URL.String())
 
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			log.Printf("could not read body: %+v\n", err)
+			errs <- errors.Wrap(err, "could not read body")
 		}
 		_ = r.Body.Close()
 
