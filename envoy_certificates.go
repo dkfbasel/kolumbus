@@ -29,11 +29,11 @@ func HandleEnvoyCertificateRequest(dns *Kolumbus, errs chan<- error) http.Handle
 		dns.RUnlock()
 
 		// initialize a fingerprint to match client certificates
-		fingerprint := Fingerprint{}
-		fingerprint.Sha245 = "abdckdkediskdkfasdklfaskkdkjfkasdjf"
+		// fingerprint := Fingerprint{}
+		// fingerprint.Sha256 = "abdckdkediskdkfasdklfaskkdkjfkasdjf"
 
 		response := CertificateResponse{}
-		response.Certificates = []Fingerprint{fingerprint}
+		response.Certificates = []Fingerprint{}
 
 		content, err := json.Marshal(response)
 		if err != nil {
@@ -58,5 +58,5 @@ type CertificateResponse struct {
 
 // Fingerprint is contains the sha256 hash of valid certificates
 type Fingerprint struct {
-	Sha245 string `json:"fingerprint_sha256,omitempty"`
+	Sha256 string `json:"fingerprint_sha256,omitempty"`
 }
