@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	helloworld "github.com/dkfbasel/kolumbus/examples/grpc-dev/src/proto/helloworld"
@@ -18,8 +19,14 @@ func main() {
 	var port int
 
 	flag.IntVar(&port, "port", 80, "web hosting port")
-	flag.StringVar(&address, "grpc", "kolumbus:8080", "kolumbus envoyproxy address")
+	flag.StringVar(&address, "kolumbus", "kolumbus:1494", "kolumbus envoyproxy address")
 	flag.Parse()
+
+	// read kolumbus address from the environment
+	envAddress := os.Getenv("kolumbus")
+	if envAddress != "" {
+		address = envAddress
+	}
 
 	if strings.Contains(address, ":") == false {
 		log.Fatalf("host for grpc connection must be specified")

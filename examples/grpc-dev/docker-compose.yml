@@ -3,29 +3,33 @@ version: '2'
 services:
 
   kolumbus:
-    container_name: kolumbus.proxy.kolumbus
+    container_name: kolumbus.grpc.dev.kolumbus
     build:
       context: ../../build
     volumes:
       # docker socket is required to query docker status from the container
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./certificates:/app/envoy/certificates
+    environment:
+      - REMOTE_PROXY_MODE=inbound
     ports:
-      - 8084:80
+      - 8084:1492
       - 8086:9901
 
   client:
-    container_name: kolumbus.proxy.client
+    container_name: kolumbus.grpc.dev.client
     image: dkfbasel/hot-reload-go:1.9.2
     volumes:
       - ./src/client:/go/src/github.com/dkfbasel/kolumbus/examples/grpc-dev/src/client
       - ./src/proto:/go/src/github.com/dkfbasel/kolumbus/examples/grpc-dev/src/proto
     environment:
       - PROJECT=github.com/dkfbasel/kolumbus/examples/grpc-dev/src/client
+      - KOLUMBUS=kolumbus:1494
     ports:
       - 7071:80
 
   echo:
-    container_name: kolumbus.proxy.helloworld
+    container_name: kolumbus.grpc.dev.helloworld
     image: dkfbasel/hot-reload-go:1.9.2
     volumes:
       - ./src/service:/go/src/github.com/dkfbasel/kolumbus/examples/grpc-dev/src/service
