@@ -1,10 +1,12 @@
 {
 
+  {{/* node identification */}}
   "node": {
-    "id": "kolumbus-envoyproxy",
+    "id": "kolumbus",
     "cluster": "kolumbus"
   },
 
+  {{/* admin access on port 9901 will be logged to a file */}}
   "admin": {
     "access_log_path": "/app/envoy/log/admin_access.log",
     "address": {
@@ -15,15 +17,18 @@
     }
   },
 
+  {{/* predefined static resources */}}
   "static_resources": {
 
     "listeners": [
+
+      {{/* local proxy for development purposes */}}
       {
         "name": "kolumbus-local-proxy-listener",
         "address": {
           "socket_address": {
             "address": "0.0.0.0",
-            "port_value": "1494",
+            "port_value": "{{.LocalProxyPort}}",
           }
         },
         "filter_chains": [
@@ -33,8 +38,10 @@
                 "name": "envoy.http_connection_manager",
                 "config": {
                   "codec_type": "http2",
-                  "stat_prefix": "proxy-local",
+                  "stat_prefix": "kolumbus-proxy-local",
                   "http_filters": [{"name": "envoy.router"}],
+
+                  {{/* use dynamically resolved routes via dynamic configuration from kolumbus */}}
                   "rds": {
                     "route_config_name": "kolumbus_routes",
                     "config_source": {
@@ -51,8 +58,11 @@
             ]
           }
         ]
-      },
-      {
+      }
+
+      {{/* remote proxy listener for connections from external services */}}
+      {{if .RemoteProxyMode == "inbound"}}
+      , {
         "name": "kolumbus-remote-proxy-listener",
         "address": {
           "socket_address": {
@@ -63,6 +73,7 @@
         "filter_chains": [
           {
             "filters": [
+              {{/* not sure if this is required
               {
                 "name": "envoy.client_ssl_auth",
                 "config": {
@@ -70,12 +81,12 @@
                   "stat_prefix": "proxy-remote",
                   "refresh_delay": "60s"
                 }
-              },
+              },*/}}
               {
                 "name": "envoy.http_connection_manager",
                 "config": {
                   "codec_type": "http2",
-                  "stat_prefix": "proxy-remote",
+                  "stat_prefix": "kolumbus-proxy-remote",
                   "http_filters": [{"name": "envoy.router"}],
                   "rds": {
                     "route_config_name": "kolumbus_routes",
@@ -94,10 +105,12 @@
           }
         ]
       }
+      {{end}}
     ],
 
     "clusters": [
 
+      {{/* Kolumbus discovery service in the same container */}}
       {
         "name": "xds_cluster",
         "type": "strict_dns",
@@ -112,6 +125,8 @@
         ]
       },
 
+      {{/* remote cluster for outbound proxy mode */}}
+      {{if .RemoteProxyMode == 'outbound'}}
       {
         "name": "remote_cluster",
         "type": "strict_dns",
@@ -120,12 +135,13 @@
         "hosts": [
           {
             "socket_address": {
-              "address":"178.209.48.181",
-              "port_value": "1498"
+              "address":"{{.RemoteProxyAddress}}",
+              "port_value": "{{.RemoteProxyPort}}"
             }
           }
         ]
-      },
+      }
+      {{end}}
 
     ]
   },
