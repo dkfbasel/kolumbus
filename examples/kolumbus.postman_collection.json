@@ -1,0 +1,157 @@
+{
+	"info": {
+		"name": "Kolumbus",
+		"_postman_id": "428b6212-9dcb-c7e0-4d70-3d622a114b75",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "grpc-prod",
+			"description": "",
+			"item": [
+				{
+					"name": "Client: Envoyproxy-Admin",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "localhost:8082",
+							"host": [
+								"localhost"
+							],
+							"port": "8082"
+						},
+						"description": "Only available for grpc-prod example if an envoyproxy instance is started in the client docker container"
+					},
+					"response": []
+				},
+				{
+					"name": "Helloworld: Envoyproxy-Admin",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "localhost:8086",
+							"host": [
+								"localhost"
+							],
+							"port": "8086"
+						},
+						"description": "Only available for grpc-prod example if an envoyproxy instance is started in the echo docker container"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Client: Echo-Request",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:7071?message=send this message to the echo service",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "7071",
+					"query": [
+						{
+							"key": "message",
+							"value": "send this message to the echo service",
+							"equals": true
+						}
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Kolumbus: Routes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:8084/v2/discovery:routes",
+					"host": [
+						"localhost"
+					],
+					"port": "8084",
+					"path": [
+						"v2",
+						"discovery:routes"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Kolumbus: Clusters",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:8084/v2/discovery:clusters",
+					"host": [
+						"localhost"
+					],
+					"port": "8084",
+					"path": [
+						"v2",
+						"discovery:clusters"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Kolumbus: Certificates",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:8084/v1/certs/list/approved",
+					"host": [
+						"localhost"
+					],
+					"port": "8084",
+					"path": [
+						"v1",
+						"certs",
+						"list",
+						"approved"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Kolumbus: Envoyproxy-Admin",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:8086",
+					"host": [
+						"localhost"
+					],
+					"port": "8086"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
