@@ -2,8 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
-	"log"
 	"net/http"
 
 	"github.com/pkg/errors"
@@ -13,16 +11,6 @@ import (
 func HandleEnvoyCertificateRequest(dns *Kolumbus, errs chan<- error) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		log.Println("got certificate request")
-
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			log.Printf("could not read body: %+v\n", err)
-		}
-		_ = r.Body.Close()
-
-		log.Printf("body: %s\n", body)
 
 		// lock access to dns records
 		dns.RLock()

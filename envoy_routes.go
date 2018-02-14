@@ -13,16 +13,6 @@ func HandleEnvoyRouteRequest(dns *Kolumbus, errs chan<- error) http.HandlerFunc 
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		// log.Println("got routes request")
-
-		// body, err := ioutil.ReadAll(r.Body)
-		// if err != nil {
-		// 	log.Printf("could not read body: %+v\n", err)
-		// }
-		// _ = r.Body.Close()
-
-		// log.Printf("body: %s\n", body)
-
 		// initialize the envoy route reponse
 		response := EnvoyRouteResponse{
 			VersionInfo: "1",

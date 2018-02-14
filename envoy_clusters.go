@@ -13,16 +13,6 @@ func HandleEnvoyClusterRequest(dns *Kolumbus, errs chan<- error) http.HandlerFun
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		// log.Println("got cluster request")
-
-		// body, err := ioutil.ReadAll(r.Body)
-		// if err != nil {
-		// 	log.Printf("could not read body: %+v\n", err)
-		// }
-		// _ = r.Body.Close()
-
-		// log.Printf("body: %s\n", body)
-
 		response := EnvoyClusterResponse{
 			VersionInfo: "1",
 			TypeURL:     "type.googleapis.com/envoy.api.v2.Cluster",
