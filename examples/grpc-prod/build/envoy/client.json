@@ -23,7 +23,7 @@
         "address": {
           "socket_address": {
             "address": "127.0.0.1",
-            "port_value": "8081",
+            "port_value": "8081"
           }
         },
         "filter_chains": [
@@ -46,8 +46,7 @@
                         "refresh_delay": "5s"
                       }
                     }
-                  },
-
+                  }
                 }
               }
             ]
@@ -66,12 +65,11 @@
           {
             "socket_address": {
               "address": "kolumbus",
-              "port_value": "80"
-            },
+              "port_value": "1492"
+            }
           }
         ]
       }
-
     ]
   },
 
