@@ -38,33 +38,3 @@ Please note that `Kolumbus` is currently pretty new and we are still working on
 several aspects to improve the user experience.
 
 Kolumbus is provided as docker container from dkfbasel/kolumbus.
-
-
-# Medium post on ssl certificates and self signed client keys
-https://medium.com/@sevcsik/authentication-using-https-client-certificates-3c9d270e8326
-
-## generate server certificate
-files must be used as downstream tls config in envoyproxy
-
-```
-openssl req -x509 -newkey rsa:4096 -keyout server_key.pem -out server_cert.pem -nodes -days 365 -subj "/CN=localhost/O=Kolumbus-Server"
-
-openssl req -x509 -newkey rsa:4096 -keyout server.key -out server.crt -nodes -days 365 -subj "/CN=Kolumbus.Server"
-
-```
-
-
-## generate client certificate
-
-```
-openssl req -newkey rsa:4096 -keyout client.key -out client.csr -nodes -days 365 -subj "/CN=Kolumbus.Client"
-
-openssl req -x509 -newkey rsa:4096 -keyout server.key -out server.crt -nodes -days 365 -subj "/CN=localhost/O=Kolumbus-Server"
-
-```
-
-## sign client certificate with server certificate
-```
-openssl x509 -req -in client.csr -CA server.crt -CAkey server.key -out client.crt -set_serial 01 -days 365
-
-```
