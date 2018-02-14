@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/namsral/flag"
+	"github.com/pkg/errors"
 )
 
 func main() {
@@ -14,11 +15,14 @@ func main() {
 	config := Config{}
 
 	flag.IntVar(&config.DataPlanePort, "dataplane", 1492, "port to start the envoyproxy data plane discovery service on")
-	flag.IntVar(&config.LocalProxyPort, "localproxy", 1494, "port to start local proxy service of the internal envoyproxy instance on")
-	flag.StringVar(&config.RemoteProxyMode, "remote-mode", "none", "modus to use for remote proxy service (none/outbound/inbound)")
-	flag.IntVar(&config.RemoteProxyPort, "remote-port", 1498, "(inbound) port to start the remote proxy service on the internal envoyproxy instance on")
-	flag.StringVar(&config.RemoteProxyAddress, "remote-address", "", "(outbound) address of the remote proxy service to call")
+	flag.IntVar(&config.LocalProxyPort, "local-proxy", 1494, "port to start local proxy service of the internal envoyproxy instance on")
+	flag.StringVar(&config.RemoteProxyMode, "remote-proxy-mode", MODE_NONE, "modus to use for remote proxy service (none/outbound/inbound)")
+	flag.IntVar(&config.RemoteProxyPort, "remote-proxy-port", 1498, "(inbound) port to start the remote proxy service on the internal envoyproxy instance on")
+	flag.StringVar(&config.RemoteProxyAddress, "remote-proxy-address", "", "(outbound) address of the remote proxy service to call")
 	flag.Parse()
+
+	// log the configuration
+	log.Printf("- configuration: %+v\n", config)
 
 	kolumbus := FindABraveNewWorld()
 
@@ -36,12 +40,15 @@ func main() {
 
 	// start a data plane discovery service for envoyproxies to automatically
 	// create a service mesh
-	kolumbus.StartEnvoyDataPlaneServer(config.DataPlanePort, errorChan)
+	kolumbus.StartEnvoyDataPlaneServer(config, errorChan)
 	log.Println("- envoy discovery server started")
 
 	// log any errors
 	for err := range errorChan {
 		log.Printf("%+v\n", err)
+		if cause := errors.Cause(err); cause != nil {
+			log.Printf("-- %+v\n", cause)
+		}
 	}
 
 	// proxy on server:
@@ -70,3 +77,8 @@ type Config struct {
 	RemoteProxyPort    int    // port to start the remote service on (inbound)
 	RemoteProxyAddress string // address for a remote service to call (outbound)
 }
+
+// nolint
+const MODE_NONE = "none"
+const MODE_INBOUND = "inbound"
+const MODE_OUTBOUND = "outbound"

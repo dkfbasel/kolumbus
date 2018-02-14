@@ -9,7 +9,7 @@ import (
 )
 
 // HandleEnvoyClusterRequest will handle envoy discovery requests for clusters
-func HandleEnvoyClusterRequest(dns *Kolumbus, errs chan<- error) http.HandlerFunc {
+func HandleEnvoyClusterRequest(dns *Kolumbus, config Config, errs chan<- error) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 

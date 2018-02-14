@@ -9,7 +9,7 @@ import (
 )
 
 // HandleEnvoyRouteRequest will handle envoy discovery requests for routes
-func HandleEnvoyRouteRequest(dns *Kolumbus, errs chan<- error) http.HandlerFunc {
+func HandleEnvoyRouteRequest(dns *Kolumbus, config Config, errs chan<- error) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -35,7 +35,7 @@ func HandleEnvoyRouteRequest(dns *Kolumbus, errs chan<- error) http.HandlerFunc 
 			Routes:  []Route{},
 		}
 
-		// iterate through all services
+		// iterate through all services and add a cluster for every service
 		for serviceName := range dns.Services {
 
 			// define a new route to match (one for each service cluster)
@@ -55,21 +55,24 @@ func HandleEnvoyRouteRequest(dns *Kolumbus, errs chan<- error) http.HandlerFunc 
 
 		}
 
-		// TODO: only add remote services if any are specified
+		// add a remote cluster as fallback option if outbound proxy mode
+		// is specified
+		if config.RemoteProxyMode == MODE_OUTBOUND {
 
-		// add remote connections as last option (matching or routes is done
-		// in order of definition)
-		remoteServices := Route{
-			Match: RouteMatch{
-				Prefix: "/",
-			},
-			Route: RouteRouting{
-				Cluster: "remote_cluster",
-			},
+			// add remote connections as last option (matching or routes is done
+			// in order of definition)
+			remoteServices := Route{
+				Match: RouteMatch{
+					Prefix: "/",
+				},
+				Route: RouteRouting{
+					Cluster: "remote_cluster",
+				},
+			}
+
+			// append a routes for remote services to the list
+			virtualHost.Routes = append(virtualHost.Routes, remoteServices)
 		}
-
-		// append a routes for remote services to the list
-		virtualHost.Routes = append(virtualHost.Routes, remoteServices)
 
 		// only one virtual host is used
 		endpoint.VirtualHosts = []VirtualHost{virtualHost}

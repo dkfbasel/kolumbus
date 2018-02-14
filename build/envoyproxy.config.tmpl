@@ -22,7 +22,7 @@
 
     "listeners": [
 
-      {{/* local proxy for development purposes */}}
+      {{/* local proxy service for development purposes */}}
       {
         "name": "kolumbus-local-proxy-listener",
         "address": {
@@ -41,7 +41,7 @@
                   "stat_prefix": "kolumbus-proxy-local",
                   "http_filters": [{"name": "envoy.router"}],
 
-                  {{/* use dynamically resolved routes via dynamic configuration from kolumbus */}}
+                  {{/* use dynamically resolved routes via kolumbus */}}
                   "rds": {
                     "route_config_name": "kolumbus_routes",
                     "config_source": {
@@ -61,27 +61,32 @@
       }
 
       {{/* remote proxy listener for connections from external services */}}
-      {{if .RemoteProxyMode == "inbound"}}
+      {{ if eq .RemoteProxyMode "inbound" }}
       , {
         "name": "kolumbus-remote-proxy-listener",
         "address": {
           "socket_address": {
             "address": "0.0.0.0",
-            "port_value": "9090",
+            "port_value": "{{.RemoteProxyPort}}",
           }
         },
         "filter_chains": [
           {
+            "tls_context": {
+                "common_tls_context": {
+                  "tls_certificates": [{
+                    "certificate_chain": {
+                      "filename": "/app/envoy/certificates/server.crt"
+                    },
+                    "private_key": {
+                      "filename": "/app/envoy/certificates/server.key"
+                    }
+                  }]
+                },
+                {{/* all client connections must present a valid certificate */}}
+                "require_client_certificate": true
+            },
             "filters": [
-              {{/* not sure if this is required
-              {
-                "name": "envoy.client_ssl_auth",
-                "config": {
-                  "auth_api_cluster": "xds_cluster",
-                  "stat_prefix": "proxy-remote",
-                  "refresh_delay": "60s"
-                }
-              },*/}}
               {
                 "name": "envoy.http_connection_manager",
                 "config": {
@@ -119,14 +124,14 @@
           {
             "socket_address": {
               "address": "127.0.0.1",
-              "port_value": "80"
-            },
+              "port_value": "1492"
+            }
           }
         ]
       },
 
       {{/* remote cluster for outbound proxy mode */}}
-      {{if .RemoteProxyMode == 'outbound'}}
+      {{ if eq .RemoteProxyMode "outbound" }}
       {
         "name": "remote_cluster",
         "type": "strict_dns",
@@ -139,13 +144,29 @@
               "port_value": "{{.RemoteProxyPort}}"
             }
           }
-        ]
+        ],
+        {{/* client certificate to send for authentication */}}
+        "tls_context": {
+          "common_tls_context": {
+            "tls_certificates": [
+              {
+                "certificate_chain": {
+                  "filename": "/app/envoy/certificates/client.crt"
+                },
+                "private_key": {
+                  "filename": "/app/envoy/certificates/client.key"
+                }
+              }
+            ]
+          }
+        }
       }
       {{end}}
 
     ]
   },
 
+  {{/* dynamic resources loaded from kolumbus discovery service */}}
   "dynamic_resources": {
     "cds_config": {
       "api_config_source": {

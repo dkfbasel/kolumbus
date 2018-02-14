@@ -1,14 +1,10 @@
 #!/bin/sh
 
 # build the kolumbus binary
-echo "-- build kolumbus binary (y/n)"
-read buildBinary
-if [ "$buildBinary" = "y" ] || [ "$buildBinary" = "" ]; then
-  cd ..
-  gox -osarch="linux/amd64" -output="./build/kolumbus"
-  cp ./build/kolumbus ./examples/grpc-prod/build/bin/kolumbus
-  cd ./build
-fi
+cd ..
+gox -osarch="linux/amd64" -output="./build/kolumbus"
+cp ./build/kolumbus ./examples/grpc-prod/build/bin/kolumbus
+cd ./build
 
 echo "-- build docker container (y/n):"
 read buildContainer

@@ -33,16 +33,16 @@ func FindABraveNewWorld() *Kolumbus {
 
 // StartEnvoyDataPlaneServer will start a http server to provide service
 // information for envoy proxies
-func (dns *Kolumbus) StartEnvoyDataPlaneServer(address int, errs chan<- error) {
+func (dns *Kolumbus) StartEnvoyDataPlaneServer(config Config, errs chan<- error) {
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/v2/discovery:clusters", HandleEnvoyClusterRequest(dns, errs))
-	mux.HandleFunc("/v2/discovery:routes", HandleEnvoyRouteRequest(dns, errs))
-	mux.HandleFunc("/v1/certs/list/approved", HandleEnvoyCertificateRequest(dns, errs))
+	mux.HandleFunc("/v2/discovery:clusters", HandleEnvoyClusterRequest(dns, config, errs))
+	mux.HandleFunc("/v2/discovery:routes", HandleEnvoyRouteRequest(dns, config, errs))
+	mux.HandleFunc("/v1/certs/list/approved", HandleEnvoyCertificateRequest(dns, config, errs))
 	mux.HandleFunc("/", HandleAnyRequest(dns, errs))
 
 	go func() {
-		err := http.ListenAndServe(fmt.Sprintf(":%d", address), mux)
+		err := http.ListenAndServe(fmt.Sprintf(":%d", config.DataPlanePort), mux)
 		if err != nil {
 			errs <- errors.Wrap(err, "could not start discovery service")
 		}

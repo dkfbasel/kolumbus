@@ -8,7 +8,7 @@ import (
 )
 
 // HandleEnvoyCertificateRequest will handle envoy requests for ssl certificates
-func HandleEnvoyCertificateRequest(dns *Kolumbus, errs chan<- error) http.HandlerFunc {
+func HandleEnvoyCertificateRequest(dns *Kolumbus, config Config, errs chan<- error) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
