@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -32,7 +33,7 @@ func FindABraveNewWorld() *Kolumbus {
 
 // StartEnvoyDataPlaneServer will start a http server to provide service
 // information for envoy proxies
-func (dns *Kolumbus) StartEnvoyDataPlaneServer(errs chan<- error) {
+func (dns *Kolumbus) StartEnvoyDataPlaneServer(address int, errs chan<- error) {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/v2/discovery:clusters", HandleEnvoyClusterRequest(dns, errs))
@@ -41,7 +42,7 @@ func (dns *Kolumbus) StartEnvoyDataPlaneServer(errs chan<- error) {
 	mux.HandleFunc("/", HandleAnyRequest(dns, errs))
 
 	go func() {
-		err := http.ListenAndServe(":80", mux)
+		err := http.ListenAndServe(fmt.Sprintf(":%d", address), mux)
 		if err != nil {
 			errs <- errors.Wrap(err, "could not start discovery service")
 		}

@@ -17,12 +17,12 @@ func main() {
 
 	// start an envoyproxy and optionally open a port for
 	// external communication
-	kolumbus.StartEnvoyproxy(errorChan)
+	kolumbus.StartEnvoyproxy(1494, 1498, errorChan)
 	log.Println("- envoy proxy started")
 
 	// start a data plane discovery service for envoyproxies to automatically
 	// create a service mesh
-	kolumbus.StartEnvoyDataPlaneServer(errorChan)
+	kolumbus.StartEnvoyDataPlaneServer(1492, errorChan)
 	log.Println("- envoy discovery server started")
 
 	// log any errors
