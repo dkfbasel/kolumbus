@@ -28,10 +28,12 @@ to run an envoyproxy service mesh.
 In addition the kolumbus container starts its own internal envoyproxy process,
 which makes it trivial to connect local services for development purposes.
 
-Finally, it is possible to even automatically fallback to services on a remote
+Finally, it is possible to automatically fallback to services on a remote
 cluster (i.e. your integration testing server) with very little configuration.
+Respective server and client certificates will automatically be generated if
+the remote proxy mode is set to inbound.
 
-An example on how it can be used in development and production is given
+An example on how kolumbus can be used in development and production is given
 in the examples directory.
 
 Please note that `Kolumbus` is currently pretty new and we are still working on
