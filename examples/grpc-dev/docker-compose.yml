@@ -11,7 +11,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./certificates:/app/envoy/certificates
     environment:
-      - REMOTE_PROXY_MODE=inbound
+      - REMOTE_PROXY_MODE=outbound
+      - REMOTE_PROXY_ADDRESS=178.209.48.181
+      - REMOTE_PROXY_PORT=1498
     ports:
       - 8084:1492
       - 8086:9901
