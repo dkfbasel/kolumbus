@@ -9,9 +9,14 @@ services:
     volumes:
       # docker socket is required to query docker status from the container
       - /var/run/docker.sock:/var/run/docker.sock
+      # certificates are required to connect to a remote stating server
       - ./certificates:/app/envoy/certificates
     environment:
+        # proxy-mode outbound is to tell kolumbus to search for services
+        # on the remote staging server
       - REMOTE_PROXY_MODE=outbound
+      # server address and port of the remote kolumbus instance that
+      # will forward the calls to respective services on the remote host
       - REMOTE_PROXY_ADDRESS=178.209.48.181
       - REMOTE_PROXY_PORT=1498
     ports:
@@ -26,6 +31,7 @@ services:
       - ./src/proto:/go/src/github.com/dkfbasel/kolumbus/examples/grpc-dev/src/proto
     environment:
       - PROJECT=github.com/dkfbasel/kolumbus/examples/grpc-dev/src/client
+      # all grpc service requests should be sent to kolumbus
       - KOLUMBUS=kolumbus:1494
     ports:
       - 7071:80
