@@ -25,7 +25,7 @@ services:
 
   client:
     container_name: kolumbus.grpc.dev.client
-    image: dkfbasel/hot-reload-go:1.9.2
+    image: dkfbasel/hot-reload-go:1.10.2
     volumes:
       - ./src/client:/go/src/github.com/dkfbasel/kolumbus/examples/grpc-dev/src/client
       - ./src/proto:/go/src/github.com/dkfbasel/kolumbus/examples/grpc-dev/src/proto
@@ -38,7 +38,7 @@ services:
 
   echo:
     container_name: kolumbus.grpc.dev.helloworld
-    image: dkfbasel/hot-reload-go:1.9.2
+    image: dkfbasel/hot-reload-go:1.10.2
     volumes:
       - ./src/service:/go/src/github.com/dkfbasel/kolumbus/examples/grpc-dev/src/service
       - ./src/proto/helloworld:/go/src/github.com/dkfbasel/kolumbus/examples/grpc-dev/src/proto/helloworld
