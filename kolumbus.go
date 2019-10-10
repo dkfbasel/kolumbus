@@ -7,12 +7,14 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/docker/docker/api/types"
 	"github.com/pkg/errors"
 )
 
 // Kolumbus provides the methods
 type Kolumbus struct {
-	Services map[string][]Endpoint
+	ContainerInfo *types.Container
+	Services      map[string][]Endpoint
 	sync.RWMutex
 }
 

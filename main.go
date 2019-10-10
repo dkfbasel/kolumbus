@@ -4,6 +4,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/namsral/flag"
 	"github.com/pkg/errors"
@@ -13,6 +14,9 @@ func main() {
 
 	// initialize the configuration
 	config := Config{}
+
+	// get the container host name
+	config.Hostname = os.Getenv("HOSTNAME")
 
 	flag.IntVar(&config.DataPlanePort, "dataplane", 1492, "port to start the envoyproxy data plane discovery service on")
 	flag.IntVar(&config.LocalProxyPort, "local-proxy", 1494, "port to start local proxy service of the internal envoyproxy instance on")
@@ -29,8 +33,18 @@ func main() {
 	// initialize a channel of errors
 	errorChan := make(chan error)
 
+	// log any errors in a separate go routine
+	go func() {
+		for err := range errorChan {
+			log.Printf("%+v\n", err)
+			if cause := errors.Cause(err); cause != nil {
+				log.Printf("-- %+v\n", cause)
+			}
+		}
+	}()
+
 	// start watching docker containers for services
-	kolumbus.StartDockerWatch(errorChan)
+	kolumbus.StartDockerWatch(config, errorChan)
 	log.Println("- docker container watch started")
 
 	// start an envoyproxy and optionally open a port for
@@ -43,20 +57,9 @@ func main() {
 	kolumbus.StartEnvoyDataPlaneServer(config, errorChan)
 	log.Println("- envoy discovery server started")
 
-	// log any errors
-	for err := range errorChan {
-		log.Printf("%+v\n", err)
-		if cause := errors.Cause(err); cause != nil {
-			log.Printf("-- %+v\n", cause)
-		}
-	}
-
-	// proxy on server:
-	// host and port to start the server on
-
-	// proxy on remote machine:
-	// host and port of remote address
-
+	// keep application running
+	run := make(chan bool)
+	<-run
 }
 
 // Config is used to define customizable configuration options
@@ -76,6 +79,10 @@ type Config struct {
 	RemoteProxyMode    string // inbound or outbound
 	RemoteProxyPort    int    // port to start the remote service on (inbound)
 	RemoteProxyAddress string // address for a remote service to call (outbound)
+
+	// hostname of the container. this is used to identify the corresponding
+	// container in the docker container list
+	Hostname string
 }
 
 // nolint
