@@ -43,6 +43,9 @@ func main() {
 		}
 	}()
 
+	kolumbus.IdentifyContainer(config, errorChan)
+	log.Println("- start identifying container")
+
 	// start watching docker containers for services
 	kolumbus.StartDockerWatch(config, errorChan)
 	log.Println("- docker container watch started")
