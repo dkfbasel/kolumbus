@@ -25,6 +25,13 @@ func (dns *Kolumbus) StartDockerWatch(config Config, errs chan<- error) {
 	go func() {
 
 		for {
+
+			// reload container info to check if new network informations are available
+			err = dns.loadContainerInfo(cli, config.Hostname)
+			if err != nil {
+				errs <- errors.Wrap(err, "could not reload container network informations")
+			}
+
 			// find all docker services
 			services, err := findServices(cli, config, dns.getContainerNetworkIDs())
 
@@ -40,7 +47,7 @@ func (dns *Kolumbus) StartDockerWatch(config Config, errs chan<- error) {
 			}
 
 			// wait 5 seconds to check again
-			<-time.After(time.Second * 5)
+			<-time.After(config.DiscoveryInterval)
 		}
 	}()
 }

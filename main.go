@@ -5,6 +5,7 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/namsral/flag"
 	"github.com/pkg/errors"
@@ -18,20 +19,29 @@ func main() {
 	// get the container host name
 	config.Hostname = os.Getenv("HOSTNAME")
 
+	var discoveryInterval string
+
 	flag.IntVar(&config.DataPlanePort, "dataplane", 1492, "port to start the envoyproxy data plane discovery service on")
 	flag.IntVar(&config.LocalProxyPort, "local-proxy", 1494, "port to start local proxy service of the internal envoyproxy instance on")
 	flag.StringVar(&config.RemoteProxyMode, "remote-proxy-mode", MODE_NONE, "modus to use for remote proxy service (none/outbound/inbound)")
 	flag.IntVar(&config.RemoteProxyPort, "remote-proxy-port", 1498, "(inbound) port to start the remote proxy service on the internal envoyproxy instance on")
 	flag.StringVar(&config.RemoteProxyAddress, "remote-proxy-address", "", "(outbound) address of the remote proxy service to call")
+	flag.StringVar(&discoveryInterval, "discovery-interval", "5s", "interval at which new services in network will be searched (in ms/s/m/h")
 	flag.Parse()
+
+	// initialize a channel of errors
+	errorChan := make(chan error)
+
+	var err error
+	config.DiscoveryInterval, err = time.ParseDuration(discoveryInterval)
+	if err != nil {
+		errorChan <- errors.Wrap(err, "could not parse discovery interval")
+	}
 
 	// log the configuration
 	log.Printf("- configuration: %+v\n", config)
 
 	kolumbus := FindABraveNewWorld()
-
-	// initialize a channel of errors
-	errorChan := make(chan error)
 
 	// log any errors in a separate go routine
 	go func() {
@@ -86,6 +96,11 @@ type Config struct {
 	// hostname of the container. this is used to identify the corresponding
 	// container in the docker container list
 	Hostname string
+
+	// interval at which kolumbus searches for new services in the same network,
+	// if a new service will be discovered, its network address will be added
+	// to the network list
+	DiscoveryInterval time.Duration
 }
 
 // nolint
