@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -125,8 +124,6 @@ func findServices(cli *docker.Client, config Config, networks []string) (map[str
 		endpoints = append(endpoints, endpoint)
 		services[name] = endpoints
 	}
-
-	log.Printf("envoy services: %+v\n", services)
 
 	return services, nil
 }
