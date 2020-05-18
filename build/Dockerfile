@@ -2,7 +2,7 @@
 FROM envoyproxy/envoy-alpine:3016680a511cd08d60cbcb8b8338cebb76ca7dca
 
 MAINTAINER DKF-Basel <info@dkfbasel.ch>
-LABEL copyright="Departement Klinische Forschung, Basel, Switzerland. 2017"
+LABEL copyright="Departement Klinische Forschung, Basel, Switzerland. 2020"
 
 # install openssl to generate server and client certificates
 # note: maybe we can switch to a go implementation in the future
