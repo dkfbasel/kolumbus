@@ -46,7 +46,9 @@ func HandleEnvoyRouteRequest(dns *Kolumbus, config Config, errs chan<- error) ht
 				},
 				Route: RouteRouting{
 					// cluster to route to
-					Cluster: fmt.Sprintf("%s_service_cluster", serviceName),
+					Cluster:        fmt.Sprintf("%s_service_cluster", serviceName),
+					Timeout:        "60s",
+					MaxGrpcTimeout: "0",
 				},
 			}
 
@@ -132,5 +134,7 @@ type RouteMatch struct {
 
 // RouteRouting ..
 type RouteRouting struct {
-	Cluster string `json:"cluster"`
+	Cluster        string `json:"cluster"`
+	Timeout        string `json:"timeout"`
+	MaxGrpcTimeout string `json:"max_grpc_timeout"`
 }
